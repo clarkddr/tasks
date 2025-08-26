@@ -20,7 +20,7 @@ Requirements
 - Copy env file: cp .env.example .env
 - Generate App Key: php artisan key:generate
 - Run database Migrations: php artisan migrate
-- Run the Server: php artisan serve (I use Herd). This will give you a address. 
+- Run the Server: php artisan serve (I use Herd). This will give you an address. 
 - Run NPM in another Terminal window: npm run dev
 
 Just go to the address and you will see the application.
