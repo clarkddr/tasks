@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class TaskController extends Controller
@@ -92,5 +93,33 @@ class TaskController extends Controller
             $task->save();
         }
         return back()->with('success','Task deleted successfully');
+    }
+
+    public function reorder(Request $request){
+        $data = $request->validate([
+            'tasks' => ['required', 'array'],
+            'tasks.*.id' => ['required', 'integer', 'exists:tasks,id'],
+            'tasks.*.priority' => ['required', 'integer', 'min:1'],
+        ]);
+
+        // Create map with id => priority
+        $priorities = collect($data['tasks'])->mapWithKeys(fn($row) => [
+            (int)$row['id'] => (int)$row['priority'],
+        ]);
+
+        // Update tasks with priorities in transaction
+        DB::transaction(function () use ($priorities) {
+            // Cargar modelos por id (una sola consulta)
+            $tasks = Task::whereIn('id', $priorities->keys())->get();
+
+            // save every task and refresh updated_at
+            foreach ($tasks as $task) {
+                $task->priority = $priorities[$task->id];
+                $task->save();
+            }
+        });
+
+        return back()->with('success', 'Prioridades actualizadas');
+
     }
 }

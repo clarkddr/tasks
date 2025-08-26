@@ -8,5 +8,6 @@ use Inertia\Inertia;
 
 Route::resource('/tasks',TaskController::class);
 Route::get('/',[TaskController::class,'index'])->name('dashboard');
-
+// Route to use Draggable component
+Route::post('/tasks/reorder', [TaskController::class, 'reorder'])->name('tasks.reorder');
 
